@@ -836,6 +836,240 @@
 
     });
 
+    /*********************************my angularjs by 2016-8-2*********************************/
+    $(function () {
+        //通用正则
+        var FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
+        var FN_ARG_SPLIT = /,/;
+        var FN_ARG = /^\s*(_?)(\S+?)\1\s*$/;
+        var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+        window.$ejqApp = {};
+        $ejqApp.apps = [];
+        function setModule(fn, ctr) {
+            var pars = [];
+            var fnText = fn.toString().replace(STRIP_COMMENTS, '');
+            argDecl = fnText.match(FN_ARGS);
+            forEach(argDecl[1].split(FN_ARG_SPLIT), function (arg) {
+                arg.replace(FN_ARG, function (all, underscore, name) {
+                    pars.push({ name: name });
+                });
+            });
+            var queueItem = { controller: ctr, pars: pars };
+            return queueItem;
+        }
+        $ejqApp.module = function (app, obj) {
+            var apps = $.linq.where($ejqApp.apps, function (v) { return v.appName == app });
+            var isAny = apps != null && apps.length > 0;
+            if (isAny) {
+                return apps[0];
+            } else {
+                var reval = {
+                    appName: app,
+                    templateHtml: $("[ ng-app=\"" + app + "\"]").html(),
+                    getObj: function () { return $("[ ng-app=\"" + app + "\"]") },
+                    controller: function (ctr, obj) {
+                        var th = this;
+                        var app = this.getObj();
+                        var ctrObj = app.find("[ng-controller='" + ctr + "']");
+                        var queueItem = setModule(obj, ctrObj);
+                        $.each(queueItem.pars, function (i, v) {
+                            if (v.name == "$con") {
+                                v.getObj = function () {
+                                    return th.getObj().find("[ng-controller='" + ctr + "']");
+                                };
+                            }
+                            if (v.name == "$app") {
+                                v.getObj = function (selector) {
+                                    return th.getObj();
+                                }
+                            }
+                            if (v.name == "$tool") {
+                                v.method = {}
+                            }
+
+                            if (v.name == "$event") {
+                                v.getObj = function (selector) {
+                                    return th.getObj();
+                                }
+                            }
+                        })
+
+                        obj.apply(new function () { }, queueItem.pars);
+                        queueItem.name = ctr;
+                        this.controllerParas = { pars: queueItem };
+                    }
+                };
+                $ejqApp.apps.push(reval);
+                return reval;
+            }
+        }
+        $ejqApp.apps.bind = function () {
+            $($ejqApp.apps).each(function (i, v) {
+                var appObj = v.getObj();
+                appObj.html(v.templateHtml);
+                var th = v;
+                $.each(v.controllerParas, function (i, pars) {
+                    var obj = appObj.find("[ng-controller='" + pars.name + "']");
+                    $.each(pars.pars, function (i, par) {
+                        switch (par.name) {
+                            case "$scope":
+                                $scope(obj, par);
+                                break;
+                            case "$http":
+                                $http(obj, par);
+                                break;
+                        }
+                    })
+                })
+            })
+        }
+        function $scope(obj, par) {
+            var kvs = $.action.jsonDictionary(par)
+            $.each(kvs, function (i, v) {
+                if (v.key == "name") return;
+                var isArray = $.valiType.isArray(v);
+                if (isArray) {
+                    resolveArray(v.key, obj, v.value)
+                } else {
+                    resolveJson(v.key, obj, v.value)
+                }
+            })
+        }
+        function $http(obj, par) {
+            var kvs = $.action.jsonDictionary(par)
+            var kv = $.linq.single(kvs, function (v) {
+                return $.valiType.isObject(v.value);
+            });
+            if (kv == null) return;
+            var ajaxSetting = kv.value;
+            if (ajaxSetting != null) {
+
+                if (ajaxSetting.cache == null) {
+                    ajaxSetting.cache = false;
+                }
+                $.ajax({
+                    url: ajaxSetting.url,
+                    cache: ajaxSetting.cache,
+                    dataType: "json",
+                    type: ajaxSetting.type,
+                    success: function (msg) {
+                        var isArray = $.valiType.isArray(msg);
+                        if (isArray) {
+                            resolveArray(kv.key, obj, msg)
+                        } else {
+
+                            resolveJson(kv.key, obj, msg)
+                        }
+                        if (ajaxSetting.success != null) {
+                            ajaxSetting.success(msg);
+                        }
+
+                    },
+                    error: function (msg) {
+                        if (ajaxSetting.error != null) {
+                            ajaxSetting.error(msg);
+                        }
+                    }
+                });
+            }
+        }
+        function resolveJson(name, obj, json, prefix) {
+            if (prefix == null) prefix = "";
+            var kvs = $.action.jsonDictionary(json)
+            var dataHtml = obj.data("myng-html");
+            var innerHtml = obj.html();
+            if (dataHtml == null) {
+                innerHtml = obj.html();
+            } else {
+                innerHtml = dataHtml;
+            }
+            var funs = [];
+            if (innerHtml != null && innerHtml != "") {
+                $.each(kvs, function (i, v) {
+                    var isArray = $.valiType.isArray(v.value);
+                    if (isArray) {
+                        funs.push({ name: v.key, obj: obj, value: v.value, prefix: name });
+                    } else {
+                        innerHtml = innerHtml.replace(new RegExp("\{\{" + prefix + name + "\." + v.key + "\}\}"), v.value);
+                    }
+                })
+                obj.html(innerHtml);
+                obj.data("myng-html", innerHtml);
+                $.each(funs, function (i, v) {
+                    resolveArray(v.name, v.obj, v.value, v.prefix);
+                })
+            }
+        }
+        function resolveArray(name, obj, json, prefix) {
+            obj.find("[ng-repeat]").each(function () {
+                var th = $(this);
+                var innerTemplate = th.html();
+                var repeatValue = th.attr("ng-repeat");
+                prefix = prefix == null ? "" : prefix;
+                var reg = new RegExp("([a-z,A-Z][0-9,a-z,A-Z]*)\\s+in\\s+" + prefix + "." + name);
+                if (reg.test(repeatValue)) {
+                    th.html("");
+                    var itemName = repeatValue.match(reg)[1];
+                    $.each(json, function (i, jsonItem) {
+                        var kvs = $.action.jsonDictionary(jsonItem)
+                        var appendItem = innerTemplate;
+                        $.each(kvs, function (i, v) {
+                            var isArray = $.valiType.isArray(v.value);
+                            if (isArray) {
+                                debugger
+                                resolveArray(v.key, obj, v.value, name);
+                            } else {
+                                appendItem = appendItem.replace(new RegExp("\{\{" + itemName + "\." + v.key + "\}\}"), v.value);
+                            }
+                        })
+                        th.append(appendItem);
+                    });
+                }
+            })
+            var dataHtml = obj.data("myng-html", obj.html());
+        }
+        function forEach(obj, iterator, context) {
+            var key, length;
+            if (obj) {
+                if ($.valiType.isFunction(obj)) {
+                    for (key in obj) {
+                        if (key != 'prototype' && key != 'length' && key != 'name' && (!obj.hasOwnProperty || obj.hasOwnProperty(key))) {
+                            iterator.call(context, obj[key], key, obj);
+                        }
+                    }
+                } else if ($.valiType.isArray(obj) || $.valiType.isArrayLike(obj)) {
+                    var isPrimitive = typeof obj !== 'object';
+                    for (key = 0, length = obj.length; key < length; key++) {
+                        if (isPrimitive || key in obj) {
+                            iterator.call(context, obj[key], key, obj);
+                        }
+                    }
+                } else if (obj.forEach && obj.forEach !== forEach) {
+                    obj.forEach(iterator, context, obj);
+                } else if (isBlankObject(obj)) {
+                    for (key in obj) {
+                        iterator.call(context, obj[key], key, obj);
+                    }
+                } else if (typeof obj.hasOwnProperty === 'function') {
+                    for (key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            iterator.call(context, obj[key], key, obj);
+                        }
+                    }
+                } else {
+                    for (key in obj) {
+                        if (hasOwnProperty.call(obj, key)) {
+                            iterator.call(context, obj[key], key, obj);
+                        }
+                    }
+                }
+            }
+            return obj;
+        }
+
+    })
+
+
     /*********************************form操作*********************************/
     jQuery.fn.extend({
         //获取元素属性以","隔开
