@@ -3,6 +3,52 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>常用操作</title>
+    <script src="../Scripts/jquery-1.11.1.js"></script>
+    <script src="../Scripts/ejq.js"></script>
+    <script>
+        $(function () {
+            
+         
+            //这个函数在写通用框架时比较好用
+            var kvs = $.action.jsonDictionary({ id: 1, name: "张三" })//将json 转成[{key:id,value:1},{key:name:value:"张三"}] 
+
+
+            //替换所有a（js中Replace只能替换一个比较2）
+            $.action.replaceAll("abcdabc", "a", "-")
+
+
+            //检测元素是否存在，当存在时执行回调函数，超时会自动停止检测
+            $.action.elementNullComplate("#id", function () {
+
+            });
+
+            //循环执行检测选择器的元素如果存在该元素，则执行回调函数过，超过停止检测
+            $.action.elementValueReady("#id", function () {
+
+
+            })
+            //让setTimeout可以指定执行的次数
+            $.action.setTimeoutWidthNum(function () {
+
+            }, 1000, 3);//1秒执行一次，第三次将停止
+
+            //去掉最后一个字符
+            $.action.trimEnd("adfaf,", ",");
+
+            //指定位置插入字符
+            $.action.insertStr("adfaf", 2, "2");
+
+            //.NET MVC URL处理
+            //layout.cshtml定位一个hidden <input id='hid' value="@Url.Content("~/")">
+            $.action.url("/actionName/", "hid", "controllerName", "areaName") //生成的url如下 /xxx/areaName/controllerName/actionName
+            $.action.url("/actionName/", "hid", "controllerName")
+            $.action.url("/actionName/", "hid")
+
+            //更多
+            //$.action.htmlDecode
+            //$.action.htmlEncode
+        })
+    </script>
 	<meta charset="utf-8" />
 </head>
 <body>
