@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <script src="../Scripts/jquery-1.11.1.js"></script>
+    <script src="../Scripts/ejq.js"></script>
+    <script>
+        var json = [{ id: 1, name: "张三" }, { id: 2, name: "李四" }, { id: 3, name: "王五" }];
+
+        //对json进行筛选获取1和2的json集合
+        var json1And2 = $.linq.where(json, function (v) { return v.id == 1 || v.id == 2; });
+
+        //获取id为1的对象
+        var zs = $.linq.single(json, function (v) { return v.id == 1; });
+
+        //获取id>1的第一个对象
+        var list = $.linq.first(json, function (v) { return v.id > 1; });
+
+        //排序
+        var json2 = $.linq.order(json, "id", "desc");
+        
+        //移除id为1的对象
+        $.linq.remove(json, function (v) { v.id == 1; });
+     
+        //是否存在ID为1的对象，因为让删了当然反回false
+        var isAnyOne = $.linq.any(json, function (v) { v.id == 1 });
+
+
+    </script>
+    <meta charset="utf-8" />
+</head>
+<body>
+
+</body>
+</html>
