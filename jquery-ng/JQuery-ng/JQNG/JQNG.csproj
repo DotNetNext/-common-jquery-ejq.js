@@ -183,7 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="json.json" />
-    <Content Include="ng.html" />
+    <Content Include="Demos\ng.html" />
     <Content Include="Scripts\ejq.js" />
     <Content Include="Scripts\jquery-1.11.1.js" />
     <Content Include="jsonList.json" />
