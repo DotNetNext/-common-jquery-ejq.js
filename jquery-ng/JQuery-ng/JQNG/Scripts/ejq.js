@@ -2,7 +2,7 @@
 * jQuery Library v2.1
 * 说明：Jquery通用库
 * 创建时间: sunkaixuan 2014-8-22  
-* 修改时间:2016-7-25
+* 修改时间:2016-8-2
 */
 (function (window, jQuery, undefined) {
 

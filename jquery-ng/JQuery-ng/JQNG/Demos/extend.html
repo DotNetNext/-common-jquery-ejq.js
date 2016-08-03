@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <script src="../Scripts/jquery-1.11.1.js"></script>
+    <script src="../Scripts/ejq.js"></script>
+    <script>
+        //拼接字符串1
+        var str = "我是中国{0},你是哪国{0}".ejq_format("人");
+        str = str.ejq_appendFormat(",它是哪国的{0}", "猫");
+
+
+        //拼接字符串2
+        var str2 = "我是中国{p},你是哪国{p}".ejq_format({p:"人"});
+        str2 = str2.ejq_appendFormat(",它是哪国的{cat}", { cat: "猫" });
+   
+
+        var idObj = "#id".ejq_selector(); //相当于$("#id")
+
+         
+        var num = 1.2600.ejq_toFixed(2);//四舍五入取2位，和原生toFixed不一样
+
+    </script>
+	<meta charset="utf-8" />
+</head>
+<body>
+
+</body>
+</html>

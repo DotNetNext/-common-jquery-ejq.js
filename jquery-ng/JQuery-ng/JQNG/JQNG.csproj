@@ -45,6 +45,7 @@
   <ItemGroup>
     <None Include="json.json" />
     <Content Include="Demos\action.html" />
+    <Content Include="Demos\extend.html" />
     <Content Include="Demos\json.html" />
     <Content Include="Demos\ng.html" />
     <Content Include="Demos\random.html" />
