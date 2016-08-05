@@ -990,7 +990,7 @@
                     if (isArray) {
                         funs.push({ name: v.key, obj: obj, value: v.value, prefix: name });
                     } else {
-                        innerHtml = innerHtml.replace(new RegExp("\{\{" + prefix + name + "\." + v.key + "\}\}"), v.value);
+                        innerHtml = innerHtml.replace(new RegExp("\{\{" + prefix + name + "\." + v.key + "\}\}","g"), v.value);
                     }
                 })
                 obj.html(innerHtml);
@@ -1005,8 +1005,8 @@
                 var th = $(this);
                 var innerTemplate = th.html();
                 var repeatValue = th.attr("ng-repeat");
-                prefix = prefix == null ? "" : prefix;
-                var reg = new RegExp("([a-z,A-Z][0-9,a-z,A-Z]*)\\s+in\\s+" + prefix + "." + name);
+                prefix = prefix == null ? "" : prefix+".";
+                var reg = new RegExp("([a-z,A-Z][0-9,a-z,A-Z]*)\\s+in\\s+" + prefix  + name);
                 if (reg.test(repeatValue)) {
                     th.html("");
                     var itemName = repeatValue.match(reg)[1];
@@ -1016,10 +1016,9 @@
                         $.each(kvs, function (i, v) {
                             var isArray = $.valiType.isArray(v.value);
                             if (isArray) {
-                                debugger
                                 resolveArray(v.key, obj, v.value, name);
                             } else {
-                                appendItem = appendItem.replace(new RegExp("\{\{" + itemName + "\." + v.key + "\}\}"), v.value);
+                                appendItem = appendItem.replace(new RegExp("\{\{" + itemName + "\." + v.key + "\}\}","g"), v.value);
                             }
                         })
                         th.append(appendItem);
