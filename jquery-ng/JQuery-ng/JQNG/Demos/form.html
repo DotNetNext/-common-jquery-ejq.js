@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>表单填充</title>
+    <script src="../Scripts/jquery-1.11.1.js"></script>
+    <script src="../Scripts/ejq.js"></script>
+    <script>
+        $(function () {
+            $("form").formFill({ data: { isOk: 1, sex: 1, title: "标题" }, prefix: "" })
+        })
+    </script>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <form>
+        <p>    <input type="checkbox" name="isOk" value="1" /></p>
+        <p> 男<input type="radio" name="sex" value="0" />女<input type="radio" name="sex" value="1" /></p>
+        <p> <input name="title" /></p>
+    </form>
+</body>
+</html>

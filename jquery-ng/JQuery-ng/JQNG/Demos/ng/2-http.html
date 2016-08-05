@@ -16,7 +16,8 @@
 
                 $http.jsonList = { url: "json.json" };//默认 type: "get", cache:false ;
 
-                
+                //目前不能同时使用2个ajax会在最近修复这个bug
+
                 });
 
             //初始化
@@ -28,7 +29,7 @@
 </head>
 <body ng-app="ng-app">
     <div ng-controller="ctr1">
-        <h3>异步加载</h3>
+        <h3>ajax标题</h3>
         <table ng-repeat="item in  jsonList">
             <tr><td>{{item.desc}}</td><td>{{item.name}}</td></tr>
 

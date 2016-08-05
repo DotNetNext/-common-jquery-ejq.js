@@ -1,5 +1,5 @@
 ﻿/*!
-* jQuery Library v2.1
+* jQuery Library v2.2
 * 说明：Jquery通用库
 * 创建时间: sunkaixuan 2014-8-22  
 * 修改时间:2016-8-2
@@ -1005,8 +1005,8 @@
                 var th = $(this);
                 var innerTemplate = th.html();
                 var repeatValue = th.attr("ng-repeat");
-                prefix = prefix == null ? "" : prefix+".";
-                var reg = new RegExp("([a-z,A-Z][0-9,a-z,A-Z]*)\\s+in\\s+" + prefix  + name);
+                var thisPrefix = prefix == null ? "" : prefix+".";
+                var reg = new RegExp("([a-z,A-Z][0-9,a-z,A-Z]*)\\s+in\\s+" + thisPrefix + name);
                 if (reg.test(repeatValue)) {
                     th.html("");
                     var itemName = repeatValue.match(reg)[1];
