@@ -1,5 +1,5 @@
 ﻿/*!
-* jQuery Library v2.2
+* jQuery Library v2.2.1
 * 说明：Jquery通用库
 * 创建时间: sunkaixuan 2014-8-22  
 * 修改时间:2016-8-2
@@ -261,6 +261,21 @@
                     }
                 }, time);
 
+            },
+            //第一次执行和非第一次执行
+            firstAndNotFirstMethod: function (firstExcuteMethod, noFirstExcuteMethod, key) {
+                var defaultKey = "firstAndNotFirstMethod_defaultKey";
+                if ($.valiData.isEmpty(key)) {
+                    key = defaultKey;
+                }
+                var initValue = $("html").data(key);
+                if (initValue == null) {
+                    firstExcuteMethod();
+                    $("html").data(key, key);
+
+                } else {
+                    noFirstExcuteMethod();
+                }
             }
 
         },
@@ -578,16 +593,16 @@
 
         //ajax辅助
         ajaxhelper: {
-        error: function (msg, action) {
-            if (action != null) {
-                action(msg);
-            }
-            try {
-                console.log(msg);
-            } catch (e) {
+            error: function (msg, action) {
+                if (action != null) {
+                    action(msg);
+                }
+                try {
+                    console.log(msg);
+                } catch (e) {
 
+                }
             }
-        }
         },
 
         /*********************************浏览器操作*********************************/
@@ -990,7 +1005,7 @@
                     if (isArray) {
                         funs.push({ name: v.key, obj: obj, value: v.value, prefix: name });
                     } else {
-                        innerHtml = innerHtml.replace(new RegExp("\{\{" + prefix + name + "\." + v.key + "\}\}","g"), v.value);
+                        innerHtml = innerHtml.replace(new RegExp("\{\{" + prefix + name + "\." + v.key + "\}\}", "g"), v.value);
                     }
                 })
                 obj.html(innerHtml);
@@ -1005,7 +1020,7 @@
                 var th = $(this);
                 var innerTemplate = th.html();
                 var repeatValue = th.attr("ng-repeat");
-                var thisPrefix = prefix == null ? "" : prefix+".";
+                var thisPrefix = prefix == null ? "" : prefix + ".";
                 var reg = new RegExp("([a-z,A-Z][0-9,a-z,A-Z]*)\\s+in\\s+" + thisPrefix + name);
                 if (reg.test(repeatValue)) {
                     th.html("");
@@ -1018,7 +1033,7 @@
                             if (isArray) {
                                 resolveArray(v.key, obj, v.value, name);
                             } else {
-                                appendItem = appendItem.replace(new RegExp("\{\{" + itemName + "\." + v.key + "\}\}","g"), v.value);
+                                appendItem = appendItem.replace(new RegExp("\{\{" + itemName + "\." + v.key + "\}\}", "g"), v.value);
                             }
                         })
                         th.append(appendItem);
@@ -1150,7 +1165,7 @@
 
     });
 
- 
+
     /*********************************通用属性扩展*****************************/
     jQuery.ejqInit = function () {
         String.prototype.ejq_format = function (args) {
